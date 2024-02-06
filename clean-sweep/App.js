@@ -3,11 +3,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import ReportPage from './pages/ReportPage';
+import Test from './pages/Test';
+import theme from './pages/theme';
 
 const App = () => {
   return (
     <View style={styles.container}>
-      <ReportPage />
+      <BoilerplatePage />
     </View>
   );
 };
