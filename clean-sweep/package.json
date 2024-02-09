@@ -4,6 +4,7 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
+    "dev": "nodemon backend/server",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
@@ -15,7 +16,8 @@
     "react-native": "0.73.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "nodemon": "^3.0.3"
   },
   "private": true
 }
