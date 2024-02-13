@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Button, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Button, TextInput, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 
@@ -44,6 +44,9 @@ export default function ReportPage() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>
+        Report an Issue
+        </Text> 
       {location ? (
         <>
           <MapView
@@ -80,7 +83,10 @@ export default function ReportPage() {
       ) : errorMsg ? (
         <Text>{errorMsg}</Text>
       ) : (
-        <Text>Waiting for permission...</Text>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Waiting for permission...</Text>
+          <ActivityIndicator size="large" color="#006400" style={styles.activityIndicator} />
+        </View>
       )}
     </View>
   );
@@ -91,10 +97,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#ccffcc', // A light background color
   },
   map: {
     width: Dimensions.get('window').width - 50, // Smaller width
-    height: 200, // Reduced height
+    height: Dimensions.get('window').width - 50, // Reduced height
     marginVertical: 20,
   },
   buttonContainer: {
@@ -106,6 +113,10 @@ const styles = StyleSheet.create({
     padding: 10,
     marginHorizontal: 5,
     borderRadius: 5,
+    elevation: 2, // Add elevation for Android
+    shadowOpacity: 0.2, // Add shadow for iOS
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
   },
   buttonText: {
     color: '#ffffff',
@@ -115,7 +126,26 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
-    width: '80%', // Adjust as needed
-    borderColor: 'gray', // Optional styling
+    width: '80%',
+    borderRadius: 10, // Increased borderRadius
+    borderColor: '#007bff', // Adjusted borderColor
+    backgroundColor: '#ffffff', // Optional: add a background color
+    shadowOpacity: 0.1, // Optional: add shadow for iOS
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2, // Optional: add elevation for Android
   },
+  loadingText: {
+    marginBottom: 20, // Adjust this value as needed to create more space
+    fontSize: 16, // Optional: Adjust text size as needed
+  },
+  activityIndicator: {
+    // If you need to adjust the position further, add margins here
+  },
+  title: {
+    fontSize: 24, // Choose an appropriate size
+    fontWeight: 'bold', // Makes the text bold
+    marginVertical: 20, // Adds space above and below the title
+    color: '#000', // Set the color as needed
+  },  
 });
