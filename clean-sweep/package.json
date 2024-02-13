@@ -4,14 +4,17 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "dev": "nodemon backend/server",
+    "dev": "nodemon server/server",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
   "dependencies": {
+    "dotenv": "^16.4.4",
     "expo": "~50.0.4",
     "expo-status-bar": "~1.11.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.1.1",
     "react": "18.2.0",
     "react-native": "0.73.2"
   },
