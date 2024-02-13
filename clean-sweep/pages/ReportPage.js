@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Button } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Button, TextInput } from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 
 export default function ReportPage() {
   const [location, setLocation] = useState(null);
   const [selectedMessType, setSelectedMessType] = useState('');
+  const [customMessType, setCustomMessType] = useState(''); // For storing custom message type
+  const [isCustomMessTypeVisible, setIsCustomMessTypeVisible] = useState(false); // To show/hide TextInput
   const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
@@ -24,13 +26,20 @@ export default function ReportPage() {
   const messTypes = ['Trash', 'Graffiti', 'Other'];
 
   const handleMessTypeSelection = (type) => {
-    setSelectedMessType(type);
+    if (type === 'Other') {
+      setIsCustomMessTypeVisible(true);
+      setSelectedMessType('');
+    } else {
+      setIsCustomMessTypeVisible(false);
+      setSelectedMessType(type);
+    }
   };
 
   const handleSubmit = () => {
-    // Replace this with the actual submission logic to your backend
-    console.log('Submitting', { location, selectedMessType });
-    alert(`Report submitted for ${selectedMessType} at location: ${location.latitude}, ${location.longitude}`);
+    // Assume customMessType is used if selectedMessType is empty
+    const messTypeToSubmit = selectedMessType || customMessType;
+    console.log('Submitting', { location, selectedMessType: messTypeToSubmit });
+    alert(`Report submitted for ${messTypeToSubmit} at location: ${location.latitude}, ${location.longitude}`);
   };
 
   return (
@@ -58,6 +67,14 @@ export default function ReportPage() {
               </TouchableOpacity>
             ))}
           </View>
+          {isCustomMessTypeVisible && (
+            <TextInput
+              style={styles.input}
+              onChangeText={setCustomMessType}
+              value={customMessType}
+              placeholder="Enter custom message type"
+            />
+          )}
           <Button title="Submit Report" onPress={handleSubmit} />
         </>
       ) : errorMsg ? (
@@ -92,5 +109,13 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#ffffff',
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+    width: '80%', // Adjust as needed
+    borderColor: 'gray', // Optional styling
   },
 });
