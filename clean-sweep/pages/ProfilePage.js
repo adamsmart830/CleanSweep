@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Button, TextInput, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Button, TextInput, Image, TouchableOpacity, ActivityIndicator, Alert, AsyncStorage } from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
 
 export default function ProfilePage() {
@@ -8,12 +8,26 @@ export default function ProfilePage() {
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    loadProfileData();
+  }, []);
+
+  const loadProfileData = async () => {
+    const name = await AsyncStorage.getItem('name');
+    const bio = await AsyncStorage.getItem('bio');
+    const profilePic = await AsyncStorage.getItem('profilePic');
+    if (name) setName(name);
+    if (bio) setBio(bio);
+    if (profilePic) setProfilePic(JSON.parse(profilePic));
+  };
+
   const selectProfilePicture = () => {
     ImagePicker.launchImageLibrary({ mediaType: 'photo' }, (response) => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
+        Alert.alert('Error', response.error);
       } else {
         const source = { uri: response.uri };
         setProfilePic(source);
@@ -28,10 +42,13 @@ export default function ProfilePage() {
     }
     setLoading(true);
     // Simulate an API call
-    setTimeout(() => {
+    setTimeout(async () => {
       setLoading(false);
       Alert.alert(`Profile for ${name} updated.`);
       console.log('Profile submitted', { name, bio, profilePic });
+      await AsyncStorage.setItem('name', name);
+      await AsyncStorage.setItem('bio', bio);
+      await AsyncStorage.setItem('profilePic', JSON.stringify(profilePic));
     }, 2000);
   };
 
@@ -55,10 +72,11 @@ export default function ProfilePage() {
           <Text style={styles.profilePicPlaceholder}>Select Profile Picture</Text>
         )}
       </TouchableOpacity>
-      <Button title="Update Profile" onPress={handleSubmit} />
+      <Button title="Update Profile" onPress={handleSubmit} disabled={loading} />
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
