@@ -1,47 +1,60 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, TextInput, Button, Image } from 'react-native';
+import { View, Text, StyleSheet, Button, TextInput, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import * as ImagePicker from 'react-native-image-picker';
 
 export default function ProfilePage() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
-  const [profilePic, setProfilePic] = useState(null); // This could be a URI to the image
+  const [profilePic, setProfilePic] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    // Implement what happens when a user submits their profile details
-    console.log('Profile submitted', { name, bio, profilePic });
-    alert(`Profile for ${name} updated.`);
+  const selectProfilePicture = () => {
+    ImagePicker.launchImageLibrary({ mediaType: 'photo' }, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        const source = { uri: response.uri };
+        setProfilePic(source);
+      }
+    });
   };
+
+  const handleSubmit = async () => {
+    if (!name.trim() || !bio.trim()) {
+      Alert.alert('Validation Failed', 'Please fill all the fields.');
+      return;
+    }
+    setLoading(true);
+    // Simulate an API call
+    setTimeout(() => {
+      setLoading(false);
+      Alert.alert(`Profile for ${name} updated.`);
+      console.log('Profile submitted', { name, bio, profilePic });
+    }, 2000);
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Your Profile</Text>
-      
-      <TextInput
-        style={styles.input}
-        onChangeText={setName}
-        value={name}
-        placeholder="Enter your name"
-      />
-
-      <TextInput
-        style={[styles.input, {height: 100}]} // Increased height for bio input
-        onChangeText={setBio}
-        value={bio}
-        placeholder="Enter a short bio"
-        multiline={true} // Allows multiple lines of text
-        numberOfLines={4} // Adjust as needed
-      />
-
-      {/* Placeholder for Profile Picture selection - implement as needed */}
-      <View style={styles.profilePicContainer}>
+      <TextInput style={styles.input} onChangeText={setName} value={name} placeholder="Enter your name" />
+      <TextInput style={[styles.input, { height: 100 }]} onChangeText={setBio} value={bio} placeholder="Enter a short bio" multiline={true} numberOfLines={4} />
+      <TouchableOpacity style={styles.profilePicContainer} onPress={selectProfilePicture}>
         {profilePic ? (
-          <Image source={{ uri: profilePic }} style={styles.profilePic} />
+          <Image source={profilePic} style={styles.profilePic} />
         ) : (
-          <Text style={styles.profilePicPlaceholder}>Profile Picture Placeholder</Text>
+          <Text style={styles.profilePicPlaceholder}>Select Profile Picture</Text>
         )}
-        {/* You could add a button here to upload or take a photo */}
-      </View>
-
+      </TouchableOpacity>
       <Button title="Update Profile" onPress={handleSubmit} />
     </View>
   );
@@ -90,6 +103,12 @@ const styles = StyleSheet.create({
   },
   profilePicPlaceholder: {
     color: '#666',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ccffcc',
   },
   // Add more styles as needed
 });
