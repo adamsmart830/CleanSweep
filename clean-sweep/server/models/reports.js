@@ -2,13 +2,11 @@ const mongoose = require('mongoose');
 
 const reportSchema = new mongoose.Schema({
     type:{
-        type:String,
-        required:true
+        type:String
     },
     location:{
         x_coord:Number,
-        y_coord:Number,
-        required:true
+        y_coord:Number
     }
 });
 
