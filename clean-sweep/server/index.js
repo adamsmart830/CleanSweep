@@ -1,19 +1,8 @@
-import mongoose from 'mongoose';
-import Blog from './model/Blog';
-mongoose.connect("mongodb+srv://chenw22:yRnediVRq6qiAqfC@cluster0.eyhty.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/mydb";
 
-// Create a new blog post object
-const article = new Blog({
-  title: 'Awesome Post!',
-  slug: 'awesome-post',
-  published: true,
-  content: 'This is the best post ever',
-  tags: ['featured', 'announcement'],
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  console.log("Database created!");
+  db.close();
 });
-
-// Find a single blog post
-const firstArticle = await Blog.findOne({});
-console.log(firstArticle);
-
-// Insert the article in our MongoDB database
-await article.save();
