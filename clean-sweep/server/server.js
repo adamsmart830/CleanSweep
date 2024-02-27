@@ -27,6 +27,7 @@ app.post("/report", async(req,res) =>{
         const {type, location} = req.body;
         const newReport = new Report({type, location});
         await newReport.save();
+        console.log("New Report Registered: ", newReport);
     } catch(err){
         console.log("Error submitting report!", err);
         res.status(500).json({message:"Report submission failed."});

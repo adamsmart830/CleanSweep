@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Button, TextInput, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
+import api from '../api/reports'
 
 export default function ReportPage() {
   const [location, setLocation] = useState(null);
@@ -35,11 +36,18 @@ export default function ReportPage() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Assume customMessType is used if selectedMessType is empty
-    const messTypeToSubmit = selectedMessType || customMessType;
-    console.log('Submitting', { location, selectedMessType: messTypeToSubmit });
-    alert(`Report submitted for ${messTypeToSubmit} at location: ${location.latitude}, ${location.longitude}`);
+    const messType = selectedMessType || customMessType;
+    const newReport = { type: messType, location: [location.latitude, location.latitude]};
+    try {
+        // fill in here @chwill
+        const response = await api.post('/reports', newReport); 
+        console.log('Submitting', { location, selectedMessType: messType });
+        alert(`Report submitted for ${messType} at location: ${location.latitude}, ${location.longitude}`);
+    } catch (err) {
+        console.log(`Error: ${err.message}`);
+    }
   };
 
   return (
