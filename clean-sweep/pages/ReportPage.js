@@ -5,9 +5,9 @@ import MapView, { Marker } from 'react-native-maps';
 
 export default function ReportPage() {
   const [location, setLocation] = useState(null);
-  const [selectedMessType, setSelectedMessType] = useState('');
-  const [customMessType, setCustomMessType] = useState(''); // For storing custom message type
-  const [isCustomMessTypeVisible, setIsCustomMessTypeVisible] = useState(false); // To show/hide TextInput
+  const [tags, setTags] = useState([]);
+  const [customMessType, setCustomMessType] = useState('');
+  const [isCustomMessTypeVisible, setIsCustomMessTypeVisible] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
@@ -23,30 +23,28 @@ export default function ReportPage() {
     })();
   }, []);
 
-  const messTypes = ['Trash', 'Graffiti', 'Other'];
-
-  const handleMessTypeSelection = (type) => {
+  const handleTagSelection = (type) => {
     if (type === 'Other') {
       setIsCustomMessTypeVisible(true);
-      setSelectedMessType('');
     } else {
       setIsCustomMessTypeVisible(false);
-      setSelectedMessType(type);
+      if (!tags.includes(type)) {
+        setTags([...tags, type]);
+      }
     }
   };
 
-  const handleSubmit = () => {
-    // Assume customMessType is used if selectedMessType is empty
-    const messTypeToSubmit = selectedMessType || customMessType;
-    console.log('Submitting', { location, selectedMessType: messTypeToSubmit });
-    alert(`Report submitted for ${messTypeToSubmit} at location: ${location.latitude}, ${location.longitude}`);
+  const handleCustomTagSubmit = () => {
+    if (customMessType && !tags.includes(customMessType)) {
+      setTags([...tags, customMessType]);
+      setCustomMessType('');
+      setIsCustomMessTypeVisible(false);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Report an Issue
-        </Text> 
+      <Text style={styles.title}>Report an Issue</Text>
       {location ? (
         <>
           <MapView
@@ -63,29 +61,38 @@ export default function ReportPage() {
               title="Report Location"
             />
           </MapView>
+          <View style={styles.tagContainer}>
+            {tags.map((tag, index) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
+              </View>
+            ))}
+          </View>
           <View style={styles.buttonContainer}>
-            {messTypes.map((type) => (
-              <TouchableOpacity key={type} style={styles.button} onPress={() => handleMessTypeSelection(type)}>
+            {['Trash', 'Graffiti', 'Other'].map((type) => (
+              <TouchableOpacity key={type} style={styles.button} onPress={() => handleTagSelection(type)}>
                 <Text style={styles.buttonText}>{type}</Text>
               </TouchableOpacity>
             ))}
           </View>
           {isCustomMessTypeVisible && (
-            <TextInput
-              style={styles.input}
-              onChangeText={setCustomMessType}
-              value={customMessType}
-              placeholder="Enter custom message type"
-            />
+            <>
+              <TextInput
+                style={styles.input}
+                onChangeText={setCustomMessType}
+                value={customMessType}
+                placeholder="Enter custom tag"
+              />
+              <Button title="Add Tag" onPress={handleCustomTagSubmit} />
+            </>
           )}
-          <Button title="Submit Report" onPress={handleSubmit} />
         </>
       ) : errorMsg ? (
         <Text>{errorMsg}</Text>
       ) : (
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Waiting for permission...</Text>
-          <ActivityIndicator size="large" color="#006400" style={styles.activityIndicator} />
+          <ActivityIndicator size="large" color="#006400" />
         </View>
       )}
     </View>
@@ -97,11 +104,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ccffcc', // A light background color
+    backgroundColor: '#ccffcc',
   },
   map: {
-    width: Dimensions.get('window').width - 50, // Smaller width
-    height: Dimensions.get('window').width - 50, // Reduced height
+    width: Dimensions.get('window').width - 50,
+    height: Dimensions.get('window').width - 50,
     marginVertical: 20,
   },
   buttonContainer: {
@@ -113,10 +120,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginHorizontal: 5,
     borderRadius: 5,
-    elevation: 2, // Add elevation for Android
-    shadowOpacity: 0.2, // Add shadow for iOS
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
   },
   buttonText: {
     color: '#ffffff',
@@ -127,25 +130,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     width: '80%',
-    borderRadius: 10, // Increased borderRadius
-    borderColor: '#007bff', // Adjusted borderColor
-    backgroundColor: '#ffffff', // Optional: add a background color
-    shadowOpacity: 0.1, // Optional: add shadow for iOS
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2, // Optional: add elevation for Android
+    borderRadius: 10,
+    borderColor: '#007bff',
+    backgroundColor: '#ffffff',
   },
-  loadingText: {
-    marginBottom: 20, // Adjust this value as needed to create more space
-    fontSize: 16, // Optional: Adjust text size as needed
+  tagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginVertical: 10,
   },
-  activityIndicator: {
-    // If you need to adjust the position further, add margins here
+  tag: {
+    backgroundColor: '#007bff',
+    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    margin: 5,
+  },
+  tagText: {
+    color: '#ffffff',
   },
   title: {
-    fontSize: 24, // Choose an appropriate size
-    fontWeight: 'bold', // Makes the text bold
-    marginVertical: 20, // Adds space above and below the title
-    color: '#000', // Set the color as needed
-  },  
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginVertical: 20,
+    color: '#000',
+  },
 });
