@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, TextInput, Image, TouchableOpacity, ActivityIndicator, Alert, AsyncStorage } from 'react-native';
-import * as ImagePicker from 'react-native-image-picker';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  AsyncStorage,
+} from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 export default function ProfilePage() {
   const [name, setName] = useState('');
@@ -22,7 +33,7 @@ export default function ProfilePage() {
   };
 
   const selectProfilePicture = () => {
-    ImagePicker.launchImageLibrary({ mediaType: 'photo' }, (response) => {
+    launchImageLibrary({ mediaType: 'photo' }, (response) => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -41,7 +52,6 @@ export default function ProfilePage() {
       return;
     }
     setLoading(true);
-    // Simulate an API call
     setTimeout(async () => {
       setLoading(false);
       Alert.alert(`Profile for ${name} updated.`);
@@ -63,27 +73,45 @@ export default function ProfilePage() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Your Profile</Text>
-      <TextInput style={styles.input} onChangeText={setName} value={name} placeholder="Enter your name" />
-      <TextInput style={[styles.input, { height: 100 }]} onChangeText={setBio} value={bio} placeholder="Enter a short bio" multiline={true} numberOfLines={4} />
-      <TouchableOpacity style={styles.profilePicContainer} onPress={selectProfilePicture}>
+      
+      <TouchableOpacity
+        style={styles.profilePicContainer}
+        onPress={selectProfilePicture}
+      >
         {profilePic ? (
           <Image source={profilePic} style={styles.profilePic} />
         ) : (
           <Text style={styles.profilePicPlaceholder}>Select Profile Picture</Text>
         )}
       </TouchableOpacity>
+
+      {/* Moved the "Update Profile" button right after the "Select Profile Picture" */}
       <Button title="Update Profile" onPress={handleSubmit} disabled={loading} />
+
+      <TextInput
+        style={styles.input}
+        onChangeText={setName}
+        value={name}
+        placeholder="Enter your name"
+      />
+      <TextInput
+        style={[styles.input, { height: 100 }]}
+        onChangeText={setBio}
+        value={bio}
+        placeholder="Enter a short bio"
+        multiline={true}
+        numberOfLines={4}
+      />
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ccffcc', // Consistent with the ReportPage
+    backgroundColor: '#ccffcc',
   },
   title: {
     fontSize: 24,
@@ -112,8 +140,8 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 75,
-    backgroundColor: '#e9e9e9', // Placeholder color
-    overflow: 'hidden', // Ensures the image fits within the border radius
+    backgroundColor: '#e9e9e9',
+    overflow: 'hidden',
   },
   profilePic: {
     width: '100%',
@@ -128,5 +156,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ccffcc',
   },
-  // Add more styles as needed
 });
