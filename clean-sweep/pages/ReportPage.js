@@ -42,6 +42,10 @@ export default function ReportPage() {
     }
   };
 
+  const removeTag = (index) => {
+    setTags(tags.filter((_, idx) => idx !== index));
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Report an Issue</Text>
@@ -61,12 +65,14 @@ export default function ReportPage() {
               title="Report Location"
             />
           </MapView>
-          <View style={styles.tagContainer}>
-            {tags.map((tag, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{tag}</Text>
-              </View>
-            ))}
+          <View style={styles.tagBox}>
+            <View style={styles.tagContainer}>
+              {tags.map((tag, index) => (
+                <TouchableOpacity key={index} style={styles.tag} onPress={() => removeTag(index)}>
+                  <Text style={styles.tagText}>{tag}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
           <View style={styles.buttonContainer}>
             {['Trash', 'Graffiti', 'Other'].map((type) => (
@@ -92,7 +98,7 @@ export default function ReportPage() {
       ) : (
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Waiting for permission...</Text>
-          <ActivityIndicator size="large" color="#006400" />
+          <ActivityIndicator size="large" color="#006400" style={styles.activityIndicator} />
         </View>
       )}
     </View>
@@ -134,11 +140,18 @@ const styles = StyleSheet.create({
     borderColor: '#007bff',
     backgroundColor: '#ffffff',
   },
+  tagBox: {
+    borderWidth: 1,
+    borderColor: '#007bff',
+    padding: 5,
+    borderRadius: 5,
+    marginTop: 20,
+    backgroundColor: '#ffffff',
+  },
   tagContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    marginVertical: 10,
   },
   tag: {
     backgroundColor: '#007bff',
@@ -155,5 +168,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 20,
     color: '#000',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginBottom: 30, // Increased space
+    fontSize: 16,
+  },
+  activityIndicator: {
+    // Adjustments can be made here if needed
   },
 });
