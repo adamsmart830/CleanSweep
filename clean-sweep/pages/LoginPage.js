@@ -1,20 +1,39 @@
 import React from 'react'; //we need this for variables
 import { StyleSheet, View, Text, SafeAreaView, ScrollView, StatusBar, TextInput, TouchableOpacity} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native'; //we need this for navigation
-import { createNativeStackNavigator } from '@react-navigation/native-stack'; //we need this for navigation
-import EventPage from './EventPage'; //the page we are using
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import EventPage from './EventPage';
+import { Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 
-
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 //for testing purposes need navigation so can go back to login page simply restarting app doesnt work
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="logintest" component={LoginPage} options={{ title: 'Login' }}/>
-        <Stack.Screen name="eventtest" component={EventPage} options={{ title: 'Events' }}/>
-      </Stack.Navigator>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({color,size}) => {
+            let icon;
+            let Itype;
+
+            if (route.name === 'Login') {
+              icon = 'login';
+              Itype = AntDesign;
+            } else if (route.name === 'Events') {
+              icon = 'calendar-outline';
+              Itype = Ionicons;
+            }
+            return <Itype name={icon} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: 'green',
+          tabBarInactiveTintColor: 'gray',
+        })}
+      >
+        <Tab.Screen name="Login" component={LoginPage} options={{ title: 'Login' }} />
+        <Tab.Screen name="Events" component={EventPage} options={{ title: 'Events' }} />
+      </Tab.Navigator>
     </NavigationContainer>
   );
 }
@@ -43,13 +62,16 @@ const LoginPage = ({ navigation }) => {
         <View style={styles.contentContainer}>
           <TextInput
             style={styles.input}
+            placeholder="Username"
             onChangeText={User} //this is the setter function for username
             value={username} //this is the value of the username
           />
           <TextInput
             style={styles.input}
+            placeholder="Password"
             onChangeText={Pass} //this is the setter function for password
             value={password} //this is the value of the password
+            secureTextEntry={true}
           />
           <Text style={styles.error}>{error}</Text> 
           <TouchableOpacity onPress={logon} style={styles.button}>  
