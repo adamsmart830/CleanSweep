@@ -2,12 +2,11 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import ReportPage from './pages/ReportPage';
-
+import ProfilePage from './pages/ProfilePage';
 const App = () => {
   return (
     <View style={styles.container}>
-      <ReportPage />
+      <ProfilePage />
     </View>
   );
 };
