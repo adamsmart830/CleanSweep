@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const reportSchema = new mongoose.Schema({
-    type:{
-        type:String
+    user:{
+        user:String
     },
     location:{
         x_coord:Number,
@@ -10,6 +10,6 @@ const reportSchema = new mongoose.Schema({
     }
 });
 
-const Report = mongoose.model("Report",reportSchema);
+const Profile = mongoose.model("Profile",reportSchema);
 
-module.exports = Report;
+module.exports = Profile;
