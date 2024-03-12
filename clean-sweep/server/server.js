@@ -1,8 +1,10 @@
 const express = require('express');
-require('dotenv').config({path: __dirname+'../.env'});
+require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3500 // Change to whatever local port
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser')
+const cors = require('cors');
 
 // from dotenv 
 USER = process.env.MONGO_USER; 
@@ -19,7 +21,12 @@ mongoose.connect(`mongodb+srv://${USER}:${PASSWD}@$${CLUSTER}.mongodb.net`)
     console.log("Error connecting to MongoDB:", err);
 });
 
+// schema
 const Report = require("./models/reports");
+
+// add middleware
+app.use(cors());
+app.use(bodyParser.json());
 
 // endpoints for reports
 app.post("/report", async(req,res) =>{
@@ -27,7 +34,7 @@ app.post("/report", async(req,res) =>{
         const {type, location} = req.body;
         const newReport = new Report({type, location});
         await newReport.save();
-        console.log("New Report Registered: ", newReport);
+        res.status(201).send("Report saved successfully.");
     } catch(err){
         console.log("Error submitting report!", err);
         res.status(500).json({message:"Report submission failed."});
