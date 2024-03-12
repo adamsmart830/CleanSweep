@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
 
 const reportSchema = new mongoose.Schema({
-    user:{
-        user:String
+    name:{
+        name:String
     },
-    location:{
-        x_coord:Number,
-        y_coord:Number
+    bio:{
+        bio:String
+    },
+    pic:{
+        data: Buffer,
+        contentType: String
     }
 });
 
