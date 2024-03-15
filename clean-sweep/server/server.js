@@ -1,42 +1,48 @@
 const express = require('express');
 require('dotenv').config();
 const app = express();
-const PORT = process.env.PORT || 3500 // Change to whatever local port
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser')
 const cors = require('cors');
 
-// from dotenv 
-USER = process.env.MONGO_USER; 
-PASSWD = process.env.MONGO_PASSWORD;
-CLUSTER = process.env.MONGO_CLUSTER;
+const PORT = process.env.PORT || 3500;
 
+// Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// confirm connection to database 
-mongoose.connect(`mongodb+srv://${USER}:${PASSWD}@$${CLUSTER}.mongodb.net`)
+// Using destructuring for environment variables (safer and cleaner)
+const { MONGO_USER, MONGO_PASSWORD, MONGO_CLUSTER } = process.env;
+
+// MongoDB connection
+mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_CLUSTER}.mongodb.net/myDatabase?retryWrites=true&w=majority`)
 .then(() => {
     console.log("Successfully connected to MongoDB");
 }).catch((err) => {
     console.log("Error connecting to MongoDB:", err);
 });
 
-// schema
-const Report = require("./models/reports");
+// Import your Report model
+const Report = require("./models/reports"); 
 
-// add middleware
+// Middlewares
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json()); 
 
-// endpoints for reports
-app.post("/reports", async(req,res) => {
-    try{
-        const {type, location} = req.body;
-        const newReport = new Report({type, location});
+// POST endpoint for reports
+app.post("/reports", async (req, res) => {
+    try {
+        const { type, location } = req.body;
+        const newReport = new Report({ type, location });
         await newReport.save();
         res.status(201).send("Report saved successfully.");
-    } catch(err){
-        console.log("Error submitting report!", err);
-        res.status(500).json({message:"Report submission failed."});
+    } catch (err) {
+        console.error("Error submitting report!", err);
+        res.status(500).json({ message: "Report submission failed.", error: err.message });
     }
-})
+});
+
+
+// Generic error handling middleware 
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
