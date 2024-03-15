@@ -19,6 +19,31 @@ export default function App() {
     setSortMode(mode);
   };
 
+  const onDayPress = (day) => {
+    const eventForDay = eventData.find(event => event.date === day.dateString);
+    if (eventForDay) {
+      setSelectedEvent(eventForDay);
+      setModalVisible(true);
+    }
+  };
+
+  const CalendarView = () => (
+    <Calendar
+      markedDates={eventData.reduce((acc, cur) => {
+        acc[cur.date] = { marked: true, dotColor: 'green', activeOpacity: 0 };
+        return acc;
+      }, {})}
+      onDayPress={onDayPress}
+      enableSwipeMonths={true}
+      theme={{
+        arrowColor: 'green',
+        todayTextColor: 'green',
+        dotColor: 'green',
+        selectedDayBackgroundColor: 'green',
+      }}
+    />
+  );
+
   const sortedEvents = eventData.sort((a, b) => {
     if (sortMode === 'date') {
       return new Date(a.date) - new Date(b.date);
@@ -75,20 +100,6 @@ export default function App() {
     </Modal>
   );
 
-  const CalendarView = () => (
-    <Calendar
-      markedDates={eventData.reduce((acc, cur) => {
-        acc[cur.date] = { marked: true, dotColor: 'blue', activeOpacity: 0 };
-        return acc;
-      }, {})}
-      theme={{
-        selectedDayBackgroundColor: 'orange',
-        todayTextColor: 'red',
-        dotColor: 'red',
-      }}
-    />
-  );
-
   return (
     <View style={styles.container}>
       <View style={styles.switchContainer}>
@@ -124,7 +135,7 @@ const styles = StyleSheet.create({
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    paddingTop: 20,
+    paddingTop: 40,
     paddingHorizontal: 10,
   },
   switchButton: {
@@ -144,14 +155,14 @@ const styles = StyleSheet.create({
   sortButton: {
     backgroundColor: '#DAEAD7',
     padding: 10,
+    margin: 5,
     borderRadius: 20,
-    marginHorizontal: 5,
   },
   contentContainer: {
     padding: 20,
   },
   eventBubble: {
-    backgroundColor: '#F0F5F4',
+    backgroundColor: '#DAEAD7',
     padding: 15,
     borderRadius: 20,
     marginVertical: 5,
