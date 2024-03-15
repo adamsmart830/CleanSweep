@@ -29,7 +29,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // endpoints for reports
-app.post("/report", async(req,res) =>{
+app.post("/reports", async(req,res) => {
     try{
         const {type, location} = req.body;
         const newReport = new Report({type, location});

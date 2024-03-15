@@ -40,6 +40,9 @@ export default function ReportPage() {
     // Assume customMessType is used if selectedMessType is empty
     const messType = selectedMessType || customMessType;
     const newReport = { type: messType, location: [location.latitude, location.latitude]};
+    console.log(newReport)
+    await api.post('/reports', newReport);
+    /*
     try {
         // fill in here @chwill
         const response = await api.post('/reports', newReport); 
@@ -48,6 +51,7 @@ export default function ReportPage() {
     } catch (err) {
         console.log(`Error: ${err.message}`);
     }
+    */
   };
 
   return (
