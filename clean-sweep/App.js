@@ -1,56 +1,86 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Button } from 'react-native';
+import { Modal, StyleSheet, Text, View, ScrollView, TouchableOpacity, TouchableHighlight } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { StatusBar } from 'expo-status-bar';
 
-export default function App() {
-  const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
-  const [events, setEvents] = useState([
-    { id: 1, name: 'Charity Run', date: '2024-03-25', distance: 5 },
-    { id: 2, name: 'Tech Conference', date: '2024-04-10', distance: 10 },
-    { id: 3, name: 'Art Exhibition', date: '2024-05-05', distance: 3 },
-  ]);
-  const [sortType, setSortType] = useState('');
+const eventData = [
+  { id: 1, title: 'Charity Run', date: '2024-03-25', description: 'Join us for a charity run.', distance: 5 },
+  { id: 2, title: 'Tech Conference', date: '2024-04-10', description: 'Annual tech conference.', distance: 10 },
+  { id: 3, title: 'Art Exhibition', date: '2024-05-05', description: 'Explore modern art.', distance: 2 },
+];
 
-  // Function to sort events
-  const sortEvents = (type) => {
-    const sortedEvents = [...events].sort((a, b) => {
-      if (type === 'date') {
-        return new Date(a.date) - new Date(b.date);
-      } else if (type === 'distance') {
-        return a.distance - b.distance;
-      }
-    });
-    setEvents(sortedEvents);
-    setSortType(type);
+export default function App() {
+  const [viewMode, setViewMode] = useState('list');
+  const [sortMode, setSortMode] = useState('date'); // New state for sorting mode
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const sortEvents = (mode) => {
+    setSortMode(mode);
   };
 
-  // ListView component with sample events
+  const sortedEvents = eventData.sort((a, b) => {
+    if (sortMode === 'date') {
+      return new Date(a.date) - new Date(b.date);
+    } else {
+      return a.distance - b.distance;
+    }
+  });
+
   const ListView = () => (
     <ScrollView style={styles.contentContainer}>
-      <View style={styles.sortButtons}>
-        <Button title="Sort by Date" onPress={() => sortEvents('date')} />
-        <Button title="Sort by Distance" onPress={() => sortEvents('distance')} />
-      </View>
-      {events.map(event => (
-        <View key={event.id} style={styles.eventBubble}>
-          <Text>{event.name} - {event.date} - {event.distance}km</Text>
-        </View>
+      {sortedEvents.map((event) => (
+        <TouchableHighlight
+          key={event.id}
+          style={styles.eventBubble}
+          underlayColor="#DDDDDD"
+          onPress={() => {
+            setSelectedEvent(event);
+            setModalVisible(true);
+          }}
+        >
+          <Text>{event.title} - {event.date}</Text>
+        </TouchableHighlight>
       ))}
     </ScrollView>
   );
 
-  // Sample events for the calendar with marks
-  const calendarEvents = events.reduce((acc, cur) => {
-    acc[cur.date] = { marked: true, dotColor: 'blue', activeOpacity: 0 };
-    return acc;
-  }, {});
+  const EventModal = () => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={() => {
+        setModalVisible(!modalVisible);
+      }}
+    >
+      <View style={styles.centeredView}>
+        <View style={styles.modalView}>
+          <ScrollView>
+            <Text style={styles.modalText}>{selectedEvent?.title}</Text>
+            <Text>Date: {selectedEvent?.date}</Text>
+            <Text>Distance: {selectedEvent?.distance} km</Text>
+            <Text>Description: {selectedEvent?.description}</Text>
+          </ScrollView>
+          <TouchableHighlight
+            style={{ ...styles.openButton, backgroundColor: "#A4B494" }}
+            onPress={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <Text style={styles.textStyle}>Close</Text>
+          </TouchableHighlight>
+        </View>
+      </View>
+    </Modal>
+  );
 
-  // CalendarView component with a simple calendar
   const CalendarView = () => (
     <Calendar
-      markedDates={calendarEvents}
-      onDayPress={(day) => console.log('selected day', day)}
+      markedDates={eventData.reduce((acc, cur) => {
+        acc[cur.date] = { marked: true, dotColor: 'blue', activeOpacity: 0 };
+        return acc;
+      }, {})}
       theme={{
         selectedDayBackgroundColor: 'orange',
         todayTextColor: 'red',
@@ -69,7 +99,18 @@ export default function App() {
           <Text>Cal</Text>
         </TouchableOpacity>
       </View>
+      {viewMode === 'list' && (
+        <View style={styles.sortContainer}>
+          <TouchableOpacity onPress={() => sortEvents('date')} style={styles.sortButton}>
+            <Text>Sort by Date</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => sortEvents('distance')} style={styles.sortButton}>
+            <Text>Sort by Distance</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       {viewMode === 'list' ? <ListView /> : <CalendarView />}
+      <EventModal />
       <StatusBar style="auto" />
     </View>
   );
@@ -78,12 +119,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#E6EFC4',
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    paddingTop: 40,
+    paddingTop: 20,
     paddingHorizontal: 10,
   },
   switchButton: {
@@ -91,23 +132,66 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 50,
     height: 50,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#B3CBB9',
     marginHorizontal: 5,
     borderRadius: 25,
+  },
+  sortContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  sortButton: {
+    backgroundColor: '#DAEAD7',
+    padding: 10,
+    borderRadius: 20,
+    marginHorizontal: 5,
   },
   contentContainer: {
     padding: 20,
   },
   eventBubble: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#F0F5F4',
     padding: 15,
     borderRadius: 20,
     marginVertical: 5,
-    alignSelf: 'stretch',
+    width: '90%',
+    alignSelf: 'center',
   },
-  sortButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 10,
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: '#F0F5F4',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  openButton: {
+    backgroundColor: '#A4B494',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
