@@ -1,4 +1,3 @@
-//Saved!
 //create Client model for table
 const mongoose = require('mongoose')
 
