@@ -1,13 +1,14 @@
 import React from 'react'; //we need this for variables
-import { StyleSheet, View, Text, SafeAreaView, ScrollView, StatusBar, TextInput, TouchableOpacity} from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, ScrollView, StatusBar, TextInput, TouchableOpacity,Image} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native'; //we need this for navigation
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import EventPage from './EventPage';
+import ProfilePage from './ProfilePage';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
-
+const logo = require('../assets/cleansweep_logotransparent.png');
 //for testing purposes need navigation so can go back to login page simply restarting app doesnt work
 function App() {
   return (
@@ -18,22 +19,29 @@ function App() {
             let icon;
             let Itype;
 
-            if (route.name === 'Login') {
+            if (route.name === 'logintest') {
               icon = 'login';
               Itype = AntDesign;
-            } else if (route.name === 'Events') {
+            } else if (route.name === 'eventtest') {
               icon = 'calendar-outline';
+              Itype = Ionicons;
+            }
+            else if (route.name == 'profiletest') {
+              icon = 'person';
               Itype = Ionicons;
             }
             return <Itype name={icon} size={size} color={color} />;
           },
           tabBarActiveTintColor: 'green',
           tabBarInactiveTintColor: 'gray',
+          headerShown: false
         })}
       >
-        <Tab.Screen name="Login" component={LoginPage} options={{ title: 'Login' }} />
-        <Tab.Screen name="Events" component={EventPage} options={{ title: 'Events' }} />
+        <Tab.Screen name="logintest" component={LoginPage} options={{ title: 'Login' }} />
+        <Tab.Screen name="eventtest" component={EventPage} options={{ title: 'Events' }} />
+        <Tab.Screen name="profiletest" component={ProfilePage} options={{ title: 'Profile' }} />
       </Tab.Navigator>
+      
     </NavigationContainer>
   );
 }
@@ -60,6 +68,10 @@ const LoginPage = ({ navigation }) => {
       <StatusBar barStyle="dark-content" />
       <ScrollView style={styles.scrollView}>
         <View style={styles.contentContainer}>
+          <Image
+             source={logo}
+             style={styles.logo}
+          />
           <TextInput
             style={styles.input}
             placeholder="Username"
@@ -95,28 +107,45 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 0,
   },
   input: {
     height: 42,
     width: '95%',
     margin: 12,
-    borderWidth: 1,
-    padding: 10,
+    backgroundColor: '#f0fff0', 
+    paddingHorizontal: 10, 
+    paddingVertical: 8, 
+    borderRadius: 5, 
+    shadowOffset: { width: 0, height: 2.25 }, 
+    shadowOpacity: 0.15, 
+    shadowRadius: 3.5, 
   },
   button: {
     alignItems: 'center',
     backgroundColor: '#f0fff0',
     padding: 10,
     width: '95%',
+    height: 42, 
+    borderRadius: 5, 
+    shadowOffset: { width: 0, height: 2.25 }, 
+    shadowOpacity: 0.15, 
+    shadowRadius: 3.5, 
   },
   buttontext: {
     color: '#454545',
+    textAlign: 'center',
   },
   error: {
     fontSize: 14,
     color: 'red', 
   },
+  logo: {
+    width: 250, 
+    height: 100, 
+    marginBottom: 0, 
+    marginTop: 150,
+  }
 });
 
 export default App;
