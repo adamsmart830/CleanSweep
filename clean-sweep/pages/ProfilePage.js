@@ -10,12 +10,15 @@ import {
   ActivityIndicator,
   Alert,
   AsyncStorage,
+  ScrollView,
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Make sure to install this package
 
 export default function ProfilePage() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
+  const [email, setEmail] = useState('');
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -24,12 +27,12 @@ export default function ProfilePage() {
   }, []);
 
   const loadProfileData = async () => {
-    const name = await AsyncStorage.getItem('name');
-    const bio = await AsyncStorage.getItem('bio');
-    const profilePic = await AsyncStorage.getItem('profilePic');
-    if (name) setName(name);
-    if (bio) setBio(bio);
-    if (profilePic) setProfilePic(JSON.parse(profilePic));
+    const data = await AsyncStorage.multiGet(['name', 'bio', 'profilePic', 'email']);
+    const profileData = Object.fromEntries(data);
+    if (profileData.name) setName(profileData.name);
+    if (profileData.bio) setBio(profileData.bio);
+    if (profileData.profilePic) setProfilePic(JSON.parse(profileData.profilePic));
+    if (profileData.email) setEmail(profileData.email);
   };
 
   const selectProfilePicture = () => {
@@ -47,7 +50,7 @@ export default function ProfilePage() {
   };
 
   const handleSubmit = async () => {
-    if (!name.trim() || !bio.trim()) {
+    if (!name.trim() || !bio.trim() || !email.trim()) {
       Alert.alert('Validation Failed', 'Please fill all the fields.');
       return;
     }
@@ -55,9 +58,10 @@ export default function ProfilePage() {
     setTimeout(async () => {
       setLoading(false);
       Alert.alert(`Profile for ${name} updated.`);
-      console.log('Profile submitted', { name, bio, profilePic });
+      console.log('Profile submitted', { name, bio, email, profilePic });
       await AsyncStorage.setItem('name', name);
       await AsyncStorage.setItem('bio', bio);
+      await AsyncStorage.setItem('email', email);
       await AsyncStorage.setItem('profilePic', JSON.stringify(profilePic));
     }, 2000);
   };
@@ -71,67 +75,70 @@ export default function ProfilePage() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Create Your Profile</Text>
-      
-      <TouchableOpacity
-        style={styles.profilePicContainer}
-        onPress={selectProfilePicture}
-      >
+
+      <TouchableOpacity style={styles.profilePicContainer} onPress={selectProfilePicture}>
         {profilePic ? (
           <Image source={profilePic} style={styles.profilePic} />
         ) : (
-          <Text style={styles.profilePicPlaceholder}>Select Profile Picture</Text>
+          <Icon name="user-circle" size={100} color="#666" />
         )}
       </TouchableOpacity>
 
-      {/* Moved the "Update Profile" button right after the "Select Profile Picture" */}
-      <Button title="Update Profile" onPress={handleSubmit} disabled={loading} />
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          onChangeText={setName}
+          value={name}
+          placeholder="Enter your name"
+        />
+        <TextInput
+          style={styles.input}
+          onChangeText={setEmail}
+          value={email}
+          placeholder="Enter your email"
+          keyboardType="email-address"
+        />
+        <TextInput
+          style={[styles.input, { height: 100 }]}
+          onChangeText={setBio}
+          value={bio}
+          placeholder="Enter a short bio"
+          multiline={true}
+          numberOfLines={4}
+        />
+      </View>
 
-      <TextInput
-        style={styles.input}
-        onChangeText={setName}
-        value={name}
-        placeholder="Enter your name"
-      />
-      <TextInput
-        style={[styles.input, { height: 100 }]}
-        onChangeText={setBio}
-        value={bio}
-        placeholder="Enter a short bio"
-        multiline={true}
-        numberOfLines={4}
-      />
-    </View>
+      <Button title="Update Profile" onPress={handleSubmit} disabled={loading} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ccffcc',
+    backgroundColor: '#f5f5f5',
+    paddingVertical: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginVertical: 20,
-    color: '#000',
+    marginBottom: 20,
+    color: '#333',
   },
   input: {
     height: 40,
-    margin: 12,
+    marginVertical: 10,
+    paddingHorizontal: 15,
+    width: '90%',
+    borderRadius: 5,
+    borderColor: '#ccc',
     borderWidth: 1,
-    padding: 10,
-    width: '80%',
-    borderRadius: 10,
-    borderColor: '#007bff',
-    backgroundColor: '#ffffff',
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    backgroundColor: '#fff',
+    fontSize: 16,
   },
   profilePicContainer: {
     marginVertical: 20,
@@ -142,18 +149,21 @@ const styles = StyleSheet.create({
     borderRadius: 75,
     backgroundColor: '#e9e9e9',
     overflow: 'hidden',
-  },
-  profilePic: {
+    },
+    profilePic: {
     width: '100%',
     height: '100%',
-  },
-  profilePicPlaceholder: {
-    color: '#666',
-  },
-  loaderContainer: {
+    },
+    formContainer: {
+    width: '100%',
+    alignItems: 'center',
+    },
+    loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ccffcc',
-  },
-});
+    backgroundColor: '#f5f5f5',
+    },
+    });
+ 
+    
