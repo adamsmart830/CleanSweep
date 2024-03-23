@@ -1,7 +1,5 @@
 # Clean Sweep
 
-![Clean Sweep Logo](clean_sweep_logo.png)
-
 Clean Sweep is a mobile application designed to facilitate community-driven cleaning events. Whether it's a neighborhood park, beach, or city street, Clean Sweep provides a platform for individuals and groups to organize, coordinate, and participate in cleaning activities to help keep our communities clean and beautiful.
 
 ## Features
@@ -15,7 +13,7 @@ Clean Sweep is a mobile application designed to facilitate community-driven clea
 
 ## Installation
 
-Clean Sweep is available for both iOS and Android devices. 
+Clean Sweep is currently under development, but plans to release on both iOS and Android.
 
 - **iOS**: Download Clean Sweep from the App Store.
 - **Android**: Get Clean Sweep from the Google Play Store.
@@ -24,16 +22,16 @@ Clean Sweep is available for both iOS and Android devices.
 
 1. **Create an Account**: Sign up for a Clean Sweep account using your email address or social media accounts.
 2. **Explore Events**: Browse through upcoming cleaning events in your area or search for events based on your preferences.
-3. **Join an Event**: Find an event that interests you and register to participate. Mark your calendar and get ready to make a difference!
+3. **Join an Event**: Find an event near you and register to participate. Mark your calendar and get ready to make a difference!
 4. **Organize an Event**: Want to initiate a cleaning event in your community? Create an event, set the details, and invite others to join you in making a positive impact.
 
 ## Feedback
 
-We value your feedback! If you have any suggestions, encounter issues, or want to share your experience using Clean Sweep, please reach out to us at [support@cleansweepapp.com](mailto:support@cleansweepapp.com). Your input helps us improve the app and enhance the community cleaning experience for everyone.
+We value your feedback! If you have any suggestions, encounter issues, or want to share your experience using Clean Sweep, feel free to leave an [issue](https://github.com/adamsmart830/CleanSweep/issues). Your input helps us improve the app and enhance the community cleaning experience for everyone.
 
 ## Contributing
 
-If you're interested in contributing to Clean Sweep, whether through code contributions, translations, or feature suggestions, please visit our GitHub repository [here](https://github.com/cleansweep/cleansweep-app). We welcome contributions from developers and community members alike.
+If you're interested in contributing to Clean Sweep, whether through code contributions, translations, or feature suggestions, please visit our GitHub repository [here](https://github.com/adamsmart830/CleanSweep). We welcome contributions from developers and community members alike.
 
 ## License
 
