@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Button, TextInput, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
-import api from '../api/reports'
+import axios from "axios";
 
 export default function ReportPage() {
   const [location, setLocation] = useState(null);
@@ -37,21 +37,21 @@ export default function ReportPage() {
   };
 
   const handleSubmit = async () => {
-    // Assume customMessType is used if selectedMessType is empty
-    const messType = selectedMessType || customMessType;
-    const newReport = { type: messType, location: [location.latitude, location.latitude]};
-    console.log(newReport)
-    await api.post('/reports', newReport);
-    /*
     try {
-        // fill in here @chwill
-        const response = await api.post('/reports', newReport); 
-        console.log('Submitting', { location, selectedMessType: messType });
-        alert(`Report submitted for ${messType} at location: ${location.latitude}, ${location.longitude}`);
+        // Assume customMessType is used if selectedMessType is empty
+        const messType = selectedMessType || customMessType;
+        const newReport = { type: messType, location: [location.latitude, location.longitude] }; 
+
+        // POST request
+        const res = await axios.post(`http://localhost:3500/reports`, newReport)
+
+        // Handle response 
+        res.status(201).send("Report saved successfully.");
+        //console.log('Report submitted successfully:', response.data);
     } catch (err) {
-        console.log(`Error: ${err.message}`);
+        res.status(500).send("Error submitting report: ", err);
+        //console.error('Error submitting report:', err);
     }
-    */
   };
 
   return (

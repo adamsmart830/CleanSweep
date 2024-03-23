@@ -3,17 +3,15 @@ require('dotenv').config();
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
+const router = express.Router();
 
-const PORT = process.env.PORT || 3500;
+const { MONGO_USER, MONGO_PASSWORD, MONGO_CLUSTER, PORT } = process.env;
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// Using destructuring for environment variables (safer and cleaner)
-const { MONGO_USER, MONGO_PASSWORD, MONGO_CLUSTER } = process.env;
-
 // MongoDB connection
-mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_CLUSTER}.mongodb.net/myDatabase?retryWrites=true&w=majority`)
+mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_CLUSTER}.mongodb.net/myDatabase`)
 .then(() => {
     console.log("Successfully connected to MongoDB");
 }).catch((err) => {
@@ -21,28 +19,48 @@ mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_CLUSTER}
 });
 
 // Import your Report model
-const Report = require("./models/reports"); 
+const Report = require("./models/reports.js"); 
 
 // Middlewares
-app.use(cors());
-app.use(express.json()); 
+router.use(cors());
+router.use(express.json()); 
 
 // POST endpoint for reports
-app.post("/reports", async (req, res) => {
+router.post('/reports', async (req, res) => {
     try {
+        // Destructure and validate the required fields from the request body
         const { type, location } = req.body;
+
+        // Basic validation (you can expand this based on your requirements)
+        if (!type || !location || location.length !== 2) {
+            // Bad request if type or properly formatted location isn't provided
+            return res.status(400).json({ message: "Please provide a valid 'type' and 'location'." });
+        }
+
+        // Creating a new report with the request body data
         const newReport = new Report({ type, location });
-        await newReport.save();
-        res.status(201).send("Report saved successfully.");
+
+        // Save the new report to the database
+        const savedReport = await newReport.save();
+
+        // Respond with the created report
+        res.status(201).json({
+            message: "Report saved successfully.",
+            report: savedReport
+        });
+
     } catch (err) {
-        console.error("Error submitting report!", err);
-        res.status(500).json({ message: "Report submission failed.", error: err.message });
+        console.error("Error submitting report:", err);
+        // Internal Server Error for unexpected issues
+        res.status(500).json({ message: "Report submission failed due to an unexpected error.", error: err.message });
     }
 });
 
 
 // Generic error handling middleware 
-app.use((err, req, res, next) => {
+router.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
+
+module.exports = router;
