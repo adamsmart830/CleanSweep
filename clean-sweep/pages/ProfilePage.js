@@ -11,9 +11,10 @@ import {
   Alert,
   AsyncStorage,
   ScrollView,
+  Switch,
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Make sure to install this package
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function ProfilePage() {
   const [name, setName] = useState('');
@@ -21,18 +22,26 @@ export default function ProfilePage() {
   const [email, setEmail] = useState('');
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [privateProfile, setPrivateProfile] = useState(false);
+  const [skills, setSkills] = useState([]);
 
   useEffect(() => {
     loadProfileData();
   }, []);
 
   const loadProfileData = async () => {
-    const data = await AsyncStorage.multiGet(['name', 'bio', 'profilePic', 'email']);
-    const profileData = Object.fromEntries(data);
-    if (profileData.name) setName(profileData.name);
-    if (profileData.bio) setBio(profileData.bio);
-    if (profileData.profilePic) setProfilePic(JSON.parse(profileData.profilePic));
-    if (profileData.email) setEmail(profileData.email);
+    const keys = ['name', 'bio', 'profilePic', 'email', 'darkMode', 'privateProfile', 'skills'];
+    const data = await AsyncStorage.multiGet(keys);
+    const profileData = Object.fromEntries(data.map(([key, value]) => [key, JSON.parse(value)]));
+
+    setName(profileData.name || '');
+    setBio(profileData.bio || '');
+    setEmail(profileData.email || '');
+    setProfilePic(profileData.profilePic);
+    setDarkMode(profileData.darkMode || false);
+    setPrivateProfile(profileData.privateProfile || false);
+    setSkills(profileData.skills || []);
   };
 
   const selectProfilePicture = () => {
@@ -58,12 +67,23 @@ export default function ProfilePage() {
     setTimeout(async () => {
       setLoading(false);
       Alert.alert(`Profile for ${name} updated.`);
-      console.log('Profile submitted', { name, bio, email, profilePic });
-      await AsyncStorage.setItem('name', name);
-      await AsyncStorage.setItem('bio', bio);
-      await AsyncStorage.setItem('email', email);
-      await AsyncStorage.setItem('profilePic', JSON.stringify(profilePic));
+      await AsyncStorage.multiSet([
+        ['name', name],
+        ['bio', bio],
+        ['email', email],
+        ['profilePic', JSON.stringify(profilePic)],
+        ['darkMode', JSON.stringify(darkMode)],
+        ['privateProfile', JSON.stringify(privateProfile)],
+        ['skills', JSON.stringify(skills)],
+      ]);
     }, 2000);
+  };
+
+  const addSkill = (skill) => {
+    if (skill && !skills.includes(skill)) {
+      const newSkills = [...skills, skill];
+      setSkills(newSkills);
+    }
   };
 
   if (loading) {
@@ -86,84 +106,120 @@ export default function ProfilePage() {
         )}
       </TouchableOpacity>
 
-      <View style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          onChangeText={setName}
-          value={name}
-          placeholder="Enter your name"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={setEmail}
-          value={email}
-          placeholder="Enter your email"
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={[styles.input, { height: 100 }]}
-          onChangeText={setBio}
-          value={bio}
-          placeholder="Enter a short bio"
-          multiline={true}
-          numberOfLines={4}
-        />
+      <TextInput
+        style={styles.input}
+        onChangeText={setName}
+        value={name}
+        placeholder="Enter your name"
+      />
+      <TextInput
+        style={styles.input}
+        onChangeText={setEmail}
+        value={email}
+        placeholder="Enter your email"
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={[styles.input, { height: 100 }]}
+        onChangeText={setBio}
+        value={bio}
+        placeholder="Enter a short bio"
+        multiline={true}
+        numberOfLines={4}
+      />
+
+      <View style={styles.switchContainer}>
+        <Text>Dark Mode:</Text>
+        <Switch value={darkMode} onValueChange={setDarkMode} />
       </View>
 
-      <Button title="Update Profile" onPress={handleSubmit} disabled={loading} />
-    </ScrollView>
-  );
-}
+      <View style={styles.switchContainer}>
+        <Text>Private Profile:</Text>
+        <Switch value={privateProfile} onValueChange={setPrivateProfile} />
+      </View>
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    paddingVertical: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
-  },
-  input: {
-    height: 40,
-    marginVertical: 10,
-    paddingHorizontal: 15,
-    width: '90%',
-    borderRadius: 5,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    backgroundColor: '#fff',
-    fontSize: 16,
-  },
-  profilePicContainer: {
-    marginVertical: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: '#e9e9e9',
-    overflow: 'hidden',
+      <TextInput
+        style={styles.input}
+        placeholder="Add a skill"
+        onSubmitEditing={({ nativeEvent }) => addSkill(nativeEvent.text)}
+        returnKeyType="done"
+        />
+        <View style={styles.skillsContainer}>
+          {skills.map((skill, index) => (
+            <Text key={index} style={styles.skillTag}>{skill}</Text>
+          ))}
+        </View>
+  
+        <Button title="Update Profile" onPress={handleSubmit} color={darkMode ? '#000' : '#007bff'} />
+  
+      </ScrollView>
+    );
+  }
+  
+  const styles = StyleSheet.create({
+    container: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#f5f5f5',
+      paddingVertical: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 20,
+      color: '#333',
+    },
+    input: {
+      height: 40,
+      marginVertical: 10,
+      paddingHorizontal: 15,
+      width: '90%',
+      borderRadius: 5,
+      borderColor: '#ccc',
+      borderWidth: 1,
+      backgroundColor: '#fff',
+      fontSize: 16,
+    },
+    profilePicContainer: {
+      marginVertical: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      backgroundColor: '#e9e9e9',
+      overflow: 'hidden',
     },
     profilePic: {
-    width: '100%',
-    height: '100%',
-    },
-    formContainer: {
-    width: '100%',
-    alignItems: 'center',
+      width: '100%',
+      height: '100%',
     },
     loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#f5f5f5',
     },
-    });
- 
-    
+    switchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 10,
+    },
+    skillsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      marginVertical: 10,
+    },
+    skillTag: {
+      backgroundColor: '#dedede',
+      borderRadius: 10,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      margin: 5,
+      fontSize: 14,
+    },
+  });
+  
+  
