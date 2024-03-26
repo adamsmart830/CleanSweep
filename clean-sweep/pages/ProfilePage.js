@@ -161,14 +161,14 @@ export default function ProfilePage() {
       flexGrow: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#f5f5f5',
+      backgroundColor: '#ECF8EF', // Lighter green background
       paddingVertical: 20,
     },
     title: {
       fontSize: 24,
       fontWeight: 'bold',
       marginBottom: 20,
-      color: '#333',
+      color: '#2E8B57', // Darker green for text
     },
     input: {
       height: 40,
@@ -176,10 +176,11 @@ export default function ProfilePage() {
       paddingHorizontal: 15,
       width: '90%',
       borderRadius: 5,
-      borderColor: '#ccc',
+      borderColor: '#98FB98', // Pale green border
       borderWidth: 1,
-      backgroundColor: '#fff',
+      backgroundColor: '#F0FFF0', // Very light green background
       fontSize: 16,
+      color: '#006400', // Dark green text for better readability
     },
     profilePicContainer: {
       marginVertical: 20,
@@ -188,7 +189,7 @@ export default function ProfilePage() {
       width: 150,
       height: 150,
       borderRadius: 75,
-      backgroundColor: '#e9e9e9',
+      backgroundColor: '#AFEEEE', // Soft teal as a stand-in for missing profile pictures
       overflow: 'hidden',
     },
     profilePic: {
@@ -199,7 +200,7 @@ export default function ProfilePage() {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#f5f5f5',
+      backgroundColor: '#ECF8EF', // Consistent with the main background
     },
     switchContainer: {
       flexDirection: 'row',
@@ -213,13 +214,18 @@ export default function ProfilePage() {
       marginVertical: 10,
     },
     skillTag: {
-      backgroundColor: '#dedede',
+      backgroundColor: '#ADFF2F', // Light green for skills tags
       borderRadius: 10,
       paddingHorizontal: 10,
       paddingVertical: 5,
       margin: 5,
       fontSize: 14,
+      color: '#006400', // Dark green text for readability
     },
   });
   
+  // Adjusting button colors dynamically based on the darkMode state
+  // Assuming you're using a Button component that accepts a 'color' prop:
+  // <Button title="Update Profile" onPress={handleSubmit} color={darkMode ? '#2E8B57' : '#98FB98'} />
+  // Here, '#2E8B57' is a darker green used for dark mode, and '#98FB98' is a paler green for light mode.
   
